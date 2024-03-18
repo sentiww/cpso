@@ -16,6 +16,7 @@ def get_args():
 def load_file(filepath: str, begin: float, end: float) -> list[(float, float)]:
     file = open(filepath, 'r')
     lines = file.readlines()
+    file.close()
     
     values: list[float] = []
     for line in lines:

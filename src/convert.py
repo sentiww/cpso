@@ -16,6 +16,7 @@ def get_args():
 def load_file(filepath: str) -> list[str]:
     file = open(filepath, 'r')
     lines = file.readlines()
+    file.close()
 
     return lines
 
