@@ -3,7 +3,7 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 
-ecg100 = pd.read_csv(os.getcwd() + '/data/ekg100.txt', names=['values'])
+ecg100 = pd.read_csv('../data/ekg100.txt', names=['values'])
 sampling_frequency = 360
 
 ecg100['time'] = ecg100['values'].index / sampling_frequency
@@ -13,8 +13,8 @@ plt.plot(ecg100['time'], ecg100['values'])
 plt.title('Widmo amplitudowe sygnałów')
 plt.xlabel('Czas [s]')
 plt.ylabel('Sygnal')
-plt.xlim(0, 800)
-plt.ylim(-3, 2.0)
+plt.xlim(300, 302)
+plt.ylim(-1, 1.2)
 plt.grid(True)
 plt.legend()
 plt.show()
@@ -36,8 +36,9 @@ plt.grid(True)
 plt.legend()
 plt.show()
 
+
 inverse_fft = np.fft.ifft(fft)
-difference = ecg100['values'] - inverse_fft.real 
+difference = ecg100['values'] - inverse_fft.real
 
 plt.figure(figsize=(14, 8))
 plt.plot(ecg100['time'], difference, label='Różnica między sygnałem oryginalnym a odtworzonym')
