@@ -39,7 +39,9 @@ def get_frequency_amplitude_response(values: list[(float, float)]) -> (np.ndarra
     return (frequencies[:len(frequencies)//2], amplitude_spectrum[:len(frequencies)//2])
 
 
-def plot_frequency_amplitude_response(data: (np.ndarray, np.ndarray)):
+def plot_frequency_amplitude_response(values: list[(float, float)]):
+    data = get_frequency_amplitude_response(values)
+
     plt.figure(figsize=(10, 6))
     plt.plot(data[0], data[1])
     plt.title('Frequency Amplitude Response')
@@ -81,14 +83,14 @@ def get_high_pass_cheby(sampling_frequency: float, cutoff_frequency: float):
     return numerator_coeffs, denominator_coeffs
 
 
-def filter(values: list[(float, float)]):
+def plot_low_pass_filtered_data(values: list[(float, float)]):
     time, value = zip(*values)
     time = np.array(time)
     value = np.array(value)
     
     sampling_frequency = 1000
-    cutoff_frequency = 60
-    low_numerator_coeffs, low_denominator_coeffs = get_low_pass_cheby(sampling_frequency, cutoff_frequency)
+    low_cutoff_frequency = 60
+    low_numerator_coeffs, low_denominator_coeffs = get_low_pass_cheby(sampling_frequency, low_cutoff_frequency)
 
     filtered_values = signal.filtfilt(low_numerator_coeffs, low_denominator_coeffs, value)
 
@@ -121,15 +123,55 @@ def filter(values: list[(float, float)]):
     plt.ylabel('Gain')
     plt.grid(True)
 
-    high_numerator_coeffs, high_denominator_coeffs = get_high_pass_cheby(sampling_frequency, cutoff_frequency)
+    # Spectrum of original signal
+    plt.subplot(3, 2, 4)
+    original_fft = np.fft.fft(value)
+    original_freq = np.fft.fftfreq(len(value), 1 / sampling_frequency)
+    plt.plot(original_freq, np.abs(original_fft), 'b')
+    plt.title('Signal Spectrum - Original')
+    plt.xlabel('Frequency [Hz]')
+    plt.ylabel('Amplitude')
+    plt.grid(True)
 
-    high_filtered_values = signal.filtfilt(high_numerator_coeffs, high_denominator_coeffs, value)
+    # Spectrum of filtered signal
+    plt.subplot(3, 2, 5)
+    filtered_fft = np.fft.fft(filtered_values)
+    filtered_freq = np.fft.fftfreq(len(filtered_values), 1 / sampling_frequency)
+    plt.plot(filtered_freq, np.abs(filtered_fft), 'r')
+    plt.title('Signal Spectrum - Filtered')
+    plt.xlabel('Frequency [Hz]')
+    plt.ylabel('Amplitude')
+    plt.grid(True)
 
-    both_filtered_values = signal.filtfilt(high_numerator_coeffs, high_denominator_coeffs, filtered_values)
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_high_pass_filtered_data(values: list[(float, float)]):
+    time, value = zip(*values)
+    time = np.array(time)
+    value = np.array(value)
+    
+    sampling_frequency = 1000
+    high_cutoff_frequency = 5
+    high_numerator_coeffs, high_denominator_coeffs = get_high_pass_cheby(sampling_frequency, high_cutoff_frequency)
+
+    filtered_values = signal.filtfilt(high_numerator_coeffs, high_denominator_coeffs, value)
+
+    plt.figure(figsize=(14, 10))
+
+    # Original data plot
+    plt.subplot(3, 2, 1)
+    plt.plot(time, value, 'b-', label='Original')
+    plt.title('Original Data')
+    plt.xlabel('Time')
+    plt.ylabel('Value')
+    plt.grid(True)
+    plt.legend()
 
     # Filtered data plot
-    plt.subplot(3, 2, 4)
-    plt.plot(time, high_filtered_values, 'r-', label='Filtered')
+    plt.subplot(3, 2, 2)
+    plt.plot(time, filtered_values, 'r-', label='Filtered')
     plt.title('Filtered Data')
     plt.xlabel('Time')
     plt.ylabel('Value')
@@ -138,21 +180,90 @@ def filter(values: list[(float, float)]):
 
     # Frequency response plot
     w, h = signal.freqz(high_numerator_coeffs, high_denominator_coeffs, fs=sampling_frequency)
-    plt.subplot(3, 2, 5)
+    plt.subplot(3, 2, 3)
     plt.plot(0.5 * sampling_frequency * w / np.pi, np.abs(h), 'g')
     plt.title('Frequency Response')
     plt.xlabel('Frequency [Hz]')
     plt.ylabel('Gain')
     plt.grid(True)
 
+    # Spectrum of original signal
+    plt.subplot(3, 2, 4)
+    original_fft = np.fft.fft(value)
+    original_freq = np.fft.fftfreq(len(value), 1 / sampling_frequency)
+    plt.plot(original_freq, np.abs(original_fft), 'b')
+    plt.title('Signal Spectrum - Original')
+    plt.xlabel('Frequency [Hz]')
+    plt.ylabel('Amplitude')
+    plt.grid(True)
+
+    # Spectrum of filtered signal
+    plt.subplot(3, 2, 5)
+    filtered_fft = np.fft.fft(filtered_values)
+    filtered_freq = np.fft.fftfreq(len(filtered_values), 1 / sampling_frequency)
+    plt.plot(filtered_freq, np.abs(filtered_fft), 'r')
+    plt.title('Signal Spectrum - Filtered')
+    plt.xlabel('Frequency [Hz]')
+    plt.ylabel('Amplitude')
+    plt.grid(True)
+
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_band_pass_filtered_data(values: list[(float, float)]):
+    time, value = zip(*values)
+    time = np.array(time)
+    value = np.array(value)
+    
+    sampling_frequency = 1000
+    low_cutoff_frequency = 60
+    high_cutoff_frequency = 5
+    low_numerator_coeffs, low_denominator_coeffs = get_low_pass_cheby(sampling_frequency, low_cutoff_frequency)
+    high_numerator_coeffs, high_denominator_coeffs = get_high_pass_cheby(sampling_frequency, high_cutoff_frequency)
+
+    low_filtered_values = signal.filtfilt(low_numerator_coeffs, low_denominator_coeffs, value)
+    band_filtered_values = signal.filtfilt(high_numerator_coeffs, high_denominator_coeffs, low_filtered_values)
+
+    plt.figure(figsize=(14, 10))
+
+    # Original data plot
+    plt.subplot(3, 2, 1)
+    plt.plot(time, value, 'b-', label='Original')
+    plt.title('Original Data')
+    plt.xlabel('Time')
+    plt.ylabel('Value')
+    plt.grid(True)
+    plt.legend()
+
     # Filtered data plot
-    plt.subplot(3, 2, 6)
-    plt.plot(time, both_filtered_values, 'r-', label='Filtered')
+    plt.subplot(3, 2, 2)
+    plt.plot(time, band_filtered_values, 'r-', label='Filtered')
     plt.title('Filtered Data')
     plt.xlabel('Time')
     plt.ylabel('Value')
     plt.grid(True)
     plt.legend()
+
+    # Spectrum of original signal
+    plt.subplot(3, 2, 3)
+    original_fft = np.fft.fft(value)
+    original_freq = np.fft.fftfreq(len(value), 1 / sampling_frequency)
+    plt.plot(original_freq, np.abs(original_fft), 'b')
+    plt.title('Signal Spectrum - Original')
+    plt.xlabel('Frequency [Hz]')
+    plt.ylabel('Amplitude')
+    plt.grid(True)
+
+    # Spectrum of filtered signal
+    plt.subplot(3, 2, 4)
+    filtered_fft = np.fft.fft(band_filtered_values)
+    filtered_freq = np.fft.fftfreq(len(band_filtered_values), 1 / sampling_frequency)
+    plt.plot(filtered_freq, np.abs(filtered_fft), 'r')
+    plt.title('Signal Spectrum - Filtered')
+    plt.xlabel('Frequency [Hz]')
+    plt.ylabel('Amplitude')
+    plt.grid(True)
 
     plt.tight_layout()
     plt.show()
@@ -166,6 +277,15 @@ if __name__ == '__main__':
     args = get_args()
     
     entries = load_file(args.filepath)
-    filter(entries)
-    #data = get_frequency_amplitude_response(entries)
-    #plot_frequency_amplitude_response(data)
+
+    # 1
+    plot_frequency_amplitude_response(entries)
+
+    # 2
+    plot_low_pass_filtered_data(entries)
+
+    # 3
+    plot_high_pass_filtered_data(entries)
+
+    # 4
+    plot_band_pass_filtered_data(entries)
