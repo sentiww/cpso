@@ -52,32 +52,28 @@ def plot_frequency_amplitude_response(values: list[(float, float)]):
 
 
 def get_low_pass_cheby(sampling_frequency: float, cutoff_frequency: float):
-    rp = 0.1            # Passband ripple (dB)
-    rs = 40             # Stopband attenuation (dB)
+    rp = 0.1
+    rs = 40
     nyquist_freq = 0.5 * sampling_frequency
     norm_cutoff_freq = cutoff_frequency / nyquist_freq
     btype = 'low'
 
-    # Manually specify the filter order
-    N = 6  # You may need to adjust this based on your requirements
+    N = 6
 
-    # Designing the Chebyshev type I filter
     numerator_coeffs, denominator_coeffs = signal.cheby1(N, rp, norm_cutoff_freq, btype, analog=False)
 
     return numerator_coeffs, denominator_coeffs
 
 
 def get_high_pass_cheby(sampling_frequency: float, cutoff_frequency: float):
-    rp = 0.1            # Passband ripple (dB)
-    rs = 40             # Stopband attenuation (dB)
+    rp = 0.1
+    rs = 40
     nyquist_freq = 0.5 * sampling_frequency
     norm_cutoff_freq = cutoff_frequency / nyquist_freq
     btype = 'high'
 
-    # Manually specify the filter order
-    N = 6  # You may need to adjust this based on your requirements
+    N = 6
 
-    # Designing the Chebyshev type I filter
     numerator_coeffs, denominator_coeffs = signal.cheby1(N, rp, norm_cutoff_freq, btype, analog=False)
 
     return numerator_coeffs, denominator_coeffs
@@ -98,7 +94,7 @@ def plot_low_pass_filtered_data(values: list[(float, float)]):
 
     # Original data plot
     plt.subplot(3, 2, 1)
-    plt.plot(time, value, 'b-', label='Original')
+    plt.plot(time, value, 'b-')
     plt.title('Original Data')
     plt.xlabel('Time')
     plt.ylabel('Value')
@@ -107,7 +103,7 @@ def plot_low_pass_filtered_data(values: list[(float, float)]):
 
     # Filtered data plot
     plt.subplot(3, 2, 2)
-    plt.plot(time, filtered_values, 'r-', label='Filtered')
+    plt.plot(time, filtered_values, 'r-')
     plt.title('Filtered Data')
     plt.xlabel('Time')
     plt.ylabel('Value')
@@ -162,7 +158,7 @@ def plot_high_pass_filtered_data(values: list[(float, float)]):
 
     # Original data plot
     plt.subplot(3, 2, 1)
-    plt.plot(time, value, 'b-', label='Original')
+    plt.plot(time, value, 'b-')
     plt.title('Original Data')
     plt.xlabel('Time')
     plt.ylabel('Value')
@@ -171,7 +167,7 @@ def plot_high_pass_filtered_data(values: list[(float, float)]):
 
     # Filtered data plot
     plt.subplot(3, 2, 2)
-    plt.plot(time, filtered_values, 'r-', label='Filtered')
+    plt.plot(time, filtered_values, 'r-')
     plt.title('Filtered Data')
     plt.xlabel('Time')
     plt.ylabel('Value')
@@ -228,8 +224,8 @@ def plot_band_pass_filtered_data(values: list[(float, float)]):
     plt.figure(figsize=(14, 10))
 
     # Original data plot
-    plt.subplot(3, 2, 1)
-    plt.plot(time, value, 'b-', label='Original')
+    plt.subplot(2, 2, 1)
+    plt.plot(time, value, 'b-')
     plt.title('Original Data')
     plt.xlabel('Time')
     plt.ylabel('Value')
@@ -237,8 +233,8 @@ def plot_band_pass_filtered_data(values: list[(float, float)]):
     plt.legend()
 
     # Filtered data plot
-    plt.subplot(3, 2, 2)
-    plt.plot(time, band_filtered_values, 'r-', label='Filtered')
+    plt.subplot(2, 2, 2)
+    plt.plot(time, band_filtered_values, 'r-')
     plt.title('Filtered Data')
     plt.xlabel('Time')
     plt.ylabel('Value')
@@ -246,7 +242,7 @@ def plot_band_pass_filtered_data(values: list[(float, float)]):
     plt.legend()
 
     # Spectrum of original signal
-    plt.subplot(3, 2, 3)
+    plt.subplot(2, 2, 3)
     original_fft = np.fft.fft(value)
     original_freq = np.fft.fftfreq(len(value), 1 / sampling_frequency)
     plt.plot(original_freq, np.abs(original_fft), 'b')
@@ -256,7 +252,7 @@ def plot_band_pass_filtered_data(values: list[(float, float)]):
     plt.grid(True)
 
     # Spectrum of filtered signal
-    plt.subplot(3, 2, 4)
+    plt.subplot(2, 2, 4)
     filtered_fft = np.fft.fft(band_filtered_values)
     filtered_freq = np.fft.fftfreq(len(band_filtered_values), 1 / sampling_frequency)
     plt.plot(filtered_freq, np.abs(filtered_fft), 'r')
