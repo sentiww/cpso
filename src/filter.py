@@ -25,6 +25,22 @@ def load_file(filepath: str) -> list[(float, float)]:
     return values
 
 
+def plot(values: list[(float, float)]):
+    time, data = zip(*values)
+    time = np.array(time)
+    data = np.array(data)
+
+    plt.figure(figsize=(10, 6))
+    plt.plot(time, data)
+    plt.xlim(0, 2)
+    plt.title('Original signal')
+    plt.xlabel('Frequency [Hz]')
+    plt.ylabel('Signal')
+    plt.grid(True)
+    plt.legend()
+    plt.savefig(os.path.join('images/task4', "original_signal"))
+
+
 def plot_frequency_amplitude_response(values: list[(float, float)]):
     timestamps, data = zip(*values)
     freqs, spectrum = calculate_spectrum(data, 360)
@@ -37,8 +53,7 @@ def plot_frequency_amplitude_response(values: list[(float, float)]):
     plt.ylabel('Amplitude')
     plt.grid(True)
     plt.legend()
-    plt.savefig(os.path.join('images', "task4_filtered_frequency_amplitude_response"))
-    plt.show()
+    plt.savefig(os.path.join('images/task4', "original_signal_amplitude_spectrum"))
 
 
 def get_pass_cheby(sampling_frequency: float, cutoff_frequency: int or [int, int], btype: str):
@@ -54,7 +69,6 @@ def calculate_filtered_values(values, sampling_frequency, cutoff_frequency: int 
 
 
 def calculate_spectrum(values, sampling_frequency):
-    # values -= values.mean()
     spectrum = np.abs(np.fft.rfft(values)) / (len(values) // 2)
     frequencies = np.fft.rfftfreq(len(values), 1 / sampling_frequency)
     return frequencies, spectrum
@@ -80,21 +94,23 @@ def plot_pass_filtered_data(values: list[(float, float)], cutoff_frequency: floa
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
-    plt.show()
+    plt.savefig(os.path.join('images/task4', f"{btype}_signal_spectrum"))
 
     w, h = signal.freqz(numerator_coeffs, denominator_coeffs, fs=sampling_frequency)
     h = np.abs(h)
+    plt.figure(figsize=(14, 8))
     plt.plot(w, h, 'g')
-    plt.title('Frequency Response')
+    plt.title(f'Frequency Response {btype} filter')
     plt.xlabel('Frequency [Hz]')
     plt.ylabel('Gain')
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
-    plt.show()
+    plt.savefig(os.path.join('images/task4', f"{btype}_frequency_response"))
 
+    plt.figure(figsize=(14, 8))
     plt.plot(time, filtered_values, 'r-')
-    plt.title('Filtered Data')
+    plt.title(f'Filtered Signal with {btype} filter')
     plt.xlabel('Time [s]')
     plt.ylabel('Value [mV]')
     plt.xlim(0, 2)
@@ -102,7 +118,7 @@ def plot_pass_filtered_data(values: list[(float, float)], cutoff_frequency: floa
     plt.legend()
     plt.legend()
     plt.tight_layout()
-    plt.show()
+    plt.savefig(os.path.join('images/task4', f"{btype}_filtered_signal"))
 
 
 def plot_band_pass_filtered_data(values: list[(float, float)]):
@@ -158,9 +174,8 @@ def plot_band_pass_filtered_data(values: list[(float, float)]):
     plt.grid(True)
     plt.legend()
     plt.tight_layout()
-    plt.show()
 
-    plt.savefig(os.path.join('images', "filtered_band_plots"))
+    plt.savefig(os.path.join('images/task4', "filtered_band_plots"))
 
 
 '''
@@ -171,6 +186,8 @@ if __name__ == '__main__':
     args = get_args()
 
     entries = load_file(args.filepath)
+
+    plot(entries)
 
     # 1
     plot_frequency_amplitude_response(entries)

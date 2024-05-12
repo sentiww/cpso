@@ -3,4 +3,3 @@ argparse
 matplotlib
 numpy
 pandas
-tk
